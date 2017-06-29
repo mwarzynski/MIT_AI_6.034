@@ -54,7 +54,14 @@ def bfs(graph, start, goal):
 ## Once you have completed the breadth-first search,
 ## this part should be very simple to complete.
 def dfs(graph, start, goal):
-    raise NotImplementedError
+    stack = [(start, [start])]
+    while stack:
+        (node, path) = stack.pop()
+        if node == goal:
+            return path
+        for next in set(graph.get_connected_nodes(node)) - set(path):
+            stack.append((next, path + [next]))
+    return []
 
 
 ## Now we're going to add some heuristics into the search.
