@@ -40,7 +40,16 @@ from search import Graph
 # The online tester will not test them.
 
 def bfs(graph, start, goal):
-    raise NotImplementedError
+    queue = [(start, [start])]
+    visited = set([start])
+    while queue:
+        (node, path) = queue.pop()
+        if node == goal:
+            return path
+        for next in set(graph.get_connected_nodes(node)) - visited:
+            visited.add(next)
+            queue.append((next, path + [next]))
+    return []
 
 ## Once you have completed the breadth-first search,
 ## this part should be very simple to complete.
