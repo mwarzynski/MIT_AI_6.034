@@ -68,7 +68,20 @@ def dfs(graph, start, goal):
 ## Remember that hill-climbing is a modified version of depth-first search.
 ## Search direction should be towards lower heuristic values to the goal.
 def hill_climbing(graph, start, goal):
-    raise NotImplementedError
+    stack = [(start, [start])]
+    local_mins = set()
+    while stack:
+        (node, path) = stack.pop()
+        if node == goal:
+            return path
+        nodes = set(graph.get_connected_nodes(node)) - set(path) - set(local_mins)
+        sorted_nodes = sorted(nodes, key=lambda n: graph.get_heuristic(n, goal))
+        if not sorted_nodes:
+            local_mins.add(node)
+            stack = [(path[-2], path[:-1])] # go one step back
+        else:
+            stack.append((sorted_nodes[0], path + [sorted_nodes[0]]))
+    return []
 
 ## Now we're going to implement beam search, a variation on BFS
 ## that caps the amount of memory used to store paths.  Remember,
