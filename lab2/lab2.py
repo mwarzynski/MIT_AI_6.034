@@ -43,7 +43,7 @@ def bfs(graph, start, goal):
     queue = [(start, [start])]
     visited = set([start])
     while queue:
-        (node, path) = queue.pop()
+        (node, path) = queue.pop(0)
         if node == goal:
             return path
         for next in set(graph.get_connected_nodes(node)) - visited:
@@ -142,7 +142,19 @@ def branch_and_bound(graph, start, goal):
     return []
 
 def a_star(graph, start, goal):
-    raise NotImplementedError
+    queue = [(start, [start], 0, 0)] # (node, path, cost, priority)
+    visited = set([start])
+    while queue:
+        (node, path, cost, priority) = queue.pop(0)
+        if node == goal:
+            return path
+        for next in set(graph.get_connected_nodes(node)) - set(path) - visited:
+            visited.add(next)
+            new_cost = cost + graph.get_edge(node, next).length
+            new_priority = new_cost + graph.get_heuristic(next, goal)
+            queue.append((next, path + [next], new_cost, new_priority))
+        queue = sorted(queue, key=lambda n: n[3]) # by priority
+    return []
 
 
 ## It's useful to determine if a graph has a consistent and admissible
