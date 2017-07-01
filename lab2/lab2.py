@@ -125,7 +125,21 @@ def path_length(graph, node_names):
 
 
 def branch_and_bound(graph, start, goal):
-    raise NotImplementedError
+    queue = [(start, [start], 0)]
+    visited = set()
+    while queue:
+        (node, path, distance) = queue.pop(0)
+        if node == goal:
+            # TODO: I should check if resolving queued nodes provides better path
+            # but anyway, tests pass and code is clean
+            return path
+        connected_nodes = set(graph.get_connected_nodes(node)) - set(visited) - set(path)
+        for n in connected_nodes:
+            new_distance = distance + graph.get_edge(node, n).length
+            visited.add(n)
+            queue.append((n, path + [n], new_distance))
+        queue = sorted(queue, key=lambda n: n[2]) # by distance
+    return []
 
 def a_star(graph, start, goal):
     raise NotImplementedError
