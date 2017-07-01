@@ -163,11 +163,41 @@ def a_star(graph, start, goal):
 ## consistent, but not admissible?
 
 def is_admissible(graph, goal):
-    raise NotImplementedError
+    if graph.get_heuristic(goal, goal) != 0:
+        return False
+    queue = [(goal, 0)] # (node, cost)
+    visited = set([goal])
+    while queue:
+        (node, cost) = queue.pop(0)
+        for next in set(graph.get_connected_nodes(node)) - visited:
+            visited.add(next)
+            new_cost = cost + graph.get_edge(node, next).length
+            if graph.get_heuristic(next, goal) > new_cost:
+                return False
+            queue.append((next, new_cost))
+        queue = sorted(queue, key=lambda n: n[1])
+    return True
 
 def is_consistent(graph, goal):
-    raise NotImplementedError
+    if graph.get_heuristic(goal, goal) != 0:
+        return False
+    queue = [(goal, 0)] # (node, cost)
+    visited = set([goal])
+    while queue:
+        (node, cost) = queue.pop(0)
+        heuristic = graph.get_heuristic(node, goal)
+        for next in set(graph.get_connected_nodes(node)) - visited:
+            visited.add(next)
+            distance = graph.get_edge(next, node).length
+            ch = distance + heuristic
+            h = graph.get_heuristic(next, goal)
+            if h > ch:
+                return False
+            queue.append((next, cost + distance))
+        queue = sorted(queue, key=lambda n: n[1])
+    return True
 
-HOW_MANY_HOURS_THIS_PSET_TOOK = ''
-WHAT_I_FOUND_INTERESTING = ''
-WHAT_I_FOUND_BORING = ''
+
+HOW_MANY_HOURS_THIS_PSET_TOOK = '5'
+WHAT_I_FOUND_INTERESTING = 'A*'
+WHAT_I_FOUND_BORING = 'DFS/BFS'
