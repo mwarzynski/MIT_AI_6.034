@@ -100,7 +100,7 @@ quick_to_win_player = lambda board: minimax(board, depth=4,
 ## counting the number of static evaluations you make.
 ##
 ## You can use minimax() in basicplayer.py as an example.
-def alpha_beta_search_helper(board, depth, eval_fn, get_next_moves_fn, is_terminal_fn, old_alpha, old_beta, is_maximizer=True):
+def alpha_beta_search_helper(board, depth, eval_fn, get_next_moves_fn, is_terminal_fn, old_alpha, old_beta, is_maximizer=False):
     # If it's node for static evaluation, just evaluate and don't go deeper.
     if is_terminal_fn(depth, board):
         return eval_fn(board)
@@ -115,7 +115,7 @@ def alpha_beta_search_helper(board, depth, eval_fn, get_next_moves_fn, is_termin
         value *= -1
         if value > alpha:
             alpha = value
-        if alpha > beta:
+        if alpha >= beta:
             break
 
     return alpha
