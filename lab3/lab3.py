@@ -100,11 +100,46 @@ quick_to_win_player = lambda board: minimax(board, depth=4,
 ## counting the number of static evaluations you make.
 ##
 ## You can use minimax() in basicplayer.py as an example.
-def alpha_beta_search(board, depth,
-                      eval_fn,
-                      get_next_moves_fn=get_all_next_moves,
-		      is_terminal_fn=is_terminal):
-    raise NotImplementedError
+def alpha_beta_search_helper(board, depth, eval_fn, get_next_moves_fn, is_terminal_fn, old_alpha, old_beta, is_maximizer=True):
+    # If it's node for static evaluation, just evaluate and don't go deeper.
+    if is_terminal_fn(depth, board):
+        return eval_fn(board)
+
+    # Take perspective of the opponent.
+    # Thanks to reassignment, we'll always maximize score.
+    alpha = -old_beta
+    beta = -old_alpha
+
+    for _, new_board in get_next_moves_fn(board):
+        value = alpha_beta_search_helper(new_board, depth-1, eval_fn, get_next_moves_fn, is_terminal_fn, alpha, beta, not is_maximizer)
+        value *= -1
+        if value > alpha:
+            alpha = value
+        if alpha > beta:
+            break
+
+    return alpha
+
+
+def alpha_beta_search(board, depth, eval_fn, get_next_moves_fn=get_all_next_moves, is_terminal_fn=is_terminal):
+    # Set initial values for parameters.
+    alpha = NEG_INFINITY # minimum value of Maximizer
+    beta = INFINITY      # maximum value of Minimizer
+
+    # Define variable to store the best possible move accordingly to used eval_fn.
+    best_move = None
+
+    # Check every possible move in the current board.
+    for move, new_board in get_next_moves_fn(board):
+        value = alpha_beta_search_helper(new_board, depth-1, eval_fn, get_next_moves_fn, is_terminal_fn, alpha, beta)
+        value *= -1
+        # If value is greater than maximizer param, take it.
+        if value > alpha:
+            alpha = value
+            best_move = move
+
+    return best_move
+
 
 ## Now you should be able to search twice as deep in the same amount of time.
 ## (Of course, this alpha-beta-player won't work until you've defined
