@@ -57,34 +57,18 @@ def focused_evaluate(board):
     A return value >= 1000 means that the current player has won;
     a return value <= -1000 means that the current player has lost
     """
-    value = 0
-
     # Get longest chain length of both players.
     current_player_longest_chain = board.longest_chain(board.get_current_player_id())
     other_player_longest_chain = board.longest_chain(board.get_other_player_id())
 
     if current_player_longest_chain == 4:
         # Current player wins.
-        value = 5000
+        return 1000
     elif other_player_longest_chain == 4:
         # Other player wins.
-        value = -5000
+        return -1000
     else:
-        # There is no winner... yet.
-
-        # Take longest chain of both players into consideration.
-        value += current_player_longest_chain*100
-        value -= other_player_longest_chain*100
-
-        # Balls in the center are more valuable.
-        for row in range(0, 6):
-            for column in range(0, 7):
-                if board.get_cell(row, column) == board.get_current_player_id():
-                    value += abs(column - 3)*10
-                elif board.get_cell(row, column) == board.get_other_player_id():
-                    value -= abs(column - 3)*10
-
-    return value
+        return current_player_longest_chain
 
 
 ## Create a "player" function that uses the focused_evaluate function
@@ -162,13 +146,41 @@ ab_iterative_player = lambda board: \
 ## same depth.
 
 def better_evaluate(board):
-    raise NotImplementedError
+    value = 0
+
+    # Get longest chain length of both players.
+    current_player_longest_chain = board.longest_chain(board.get_current_player_id())
+    other_player_longest_chain = board.longest_chain(board.get_other_player_id())
+
+    if current_player_longest_chain == 4:
+        # Current player wins.
+        value = 5000 - board.num_tokens_on_board() # the less tokens on the board, the faster winning
+    elif other_player_longest_chain == 4:
+        # Other player wins.
+        value = -5000 + board.num_tokens_on_board()
+    else:
+        # There is no winner... yet.
+
+        # Take longest chain of both players into consideration.
+        value += current_player_longest_chain*30
+        value -= other_player_longest_chain*30
+
+        # Tokens in the center are more valuable.
+        for row in range(0, 6):
+            for column in range(0, 7):
+                if board.get_cell(row, column) == board.get_current_player_id():
+                    value += abs(3 - abs(column - 3))*10*abs(3 - abs(row - 2))
+                elif board.get_cell(row, column) == board.get_other_player_id():
+                    value -= abs(3 - abs(column - 3))*10*abs(3 - abs(row - 2))
+
+    return value
+
 
 # Comment this line after you've fully implemented better_evaluate
-better_evaluate = memoize(basic_evaluate)
+#better_evaluate = memoize(basic_evaluate)
 
 # Uncomment this line to make your better_evaluate run faster.
-# better_evaluate = memoize(better_evaluate)
+better_evaluate = memoize(better_evaluate)
 
 # For debugging: Change this if-guard to True, to unit-test
 # your better_evaluate function.
@@ -226,12 +238,10 @@ def run_test_tree_search(search, board, depth):
 ## Do you want us to use your code in a tournament against other students? See
 ## the description in the problem set. The tournament is completely optional
 ## and has no effect on your grade.
-COMPETE = (None)
+COMPETE = (False)
 
 ## The standard survey questions.
-HOW_MANY_HOURS_THIS_PSET_TOOK = ""
-WHAT_I_FOUND_INTERESTING = ""
-WHAT_I_FOUND_BORING = ""
-NAME = ""
-EMAIL = ""
+HOW_MANY_HOURS_THIS_PSET_TOOK = "7"
+WHAT_I_FOUND_INTERESTING = "Alpha-Beta"
+WHAT_I_FOUND_BORING = "yay, nothing"
 
